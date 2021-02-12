@@ -342,6 +342,8 @@ impl TlsAcceptor {
         let mut acceptor = SslAcceptor::mozilla_intermediate(SslMethod::tls())?;
         acceptor.set_private_key(&builder.identity.0.pkey)?;
         acceptor.set_certificate(&builder.identity.0.cert)?;
+        // TOFU enabler:
+        acceptor.set_verify_callback(SslVerifyMode::PEER, |_, _| true);
         for cert in builder.identity.0.chain.iter().rev() {
             acceptor.add_extra_chain_cert(cert.to_owned())?;
         }
